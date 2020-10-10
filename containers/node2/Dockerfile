@@ -1,0 +1,1 @@
+FROM receptor:latest
