@@ -5,6 +5,7 @@ set -e
 
 # List of nodes
 NODES="node1 node2 node3"
+declare -A NODEIPS=( ["node1"]="172.30.99.11" ["node2"]="172.30.99.12" ["node3"]="172.30.99.13" )
 
 # Get the base Receptor image
 $CMD pull quay.io/project-receptor/receptor:latest
@@ -25,8 +26,11 @@ $CMD network create -d bridge \
 for node in $NODES; do
   $CMD run -d --rm \
     --name $node \
-    --hostname "$node.receptor" \
     --network receptor \
+    --ip ${NODEIPS[$node]} \
+    --add-host "node1.receptor:172.30.99.11" \
+    --add-host "node2.receptor:172.30.99.12" \
+    --add-host "node3.receptor:172.30.99.13" \
     --volume $PWD/conf/$node:/etc/receptor:Z \
     receptor-$node:latest
 done
