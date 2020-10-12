@@ -1,0 +1,42 @@
+[ ca ]
+default_ca	= CA_default		
+
+[ CA_default ]
+
+dir		= ./ca/pki
+certs		= $dir/certs
+crl_dir		= $dir/crl
+database	= $dir/index.txt
+new_certs_dir	= $dir/newcerts
+certificate	= $dir/cacert.pem
+serial		= $dir/serial
+crlnumber	= $dir/crlnumber
+crl		= $dir/crl.pem
+private_key	= $dir/private/cakey.pem
+name_opt 	= ca_default
+cert_opt 	= ca_default
+default_days	= 365
+default_crl_days= 30
+default_md	= sha256
+preserve	= no
+policy		= policy_match
+email_in_dn	= no
+rand_serial     = no
+
+[ policy_match ]
+countryName		= match
+stateOrProvinceName	= match
+organizationName	= match
+organizationalUnitName	= optional
+commonName		= supplied
+emailAddress		= optional
+
+[ policy_anything ]
+countryName		= optional
+stateOrProvinceName	= optional
+localityName		= optional
+organizationName	= optional
+organizationalUnitName	= optional
+commonName		= supplied
+emailAddress		= optional
+

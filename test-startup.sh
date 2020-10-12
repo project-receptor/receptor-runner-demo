@@ -3,9 +3,19 @@ set -e
 
 . ./test-env.sh
 
-# List of nodes
-NODES="node1 node2 node3"
-declare -A NODEIPS=( ["node1"]="172.30.99.11" ["node2"]="172.30.99.12" ["node3"]="172.30.99.13" )
+# Create the CA
+mkdir -p ca/pki/newcerts
+touch ca/pki/index.txt
+openssl genrsa -out ca/ca.key 2048
+openssl req -x509 -new -key ca/ca.key -out ca/ca.crt -subj "/C=US/ST=North Carolina/L=Durham/O=Red Hat/OU=Project Receptor/CN=Demo CA"
+cp ca/ca.crt conf/node2/ca.crt
+
+# Generate the node backend certificates
+for node in $NODES; do
+  openssl genrsa -out conf/$node/backend.key 2048
+  openssl req -key conf/$node/backend.key -new -out conf/$node/backend.req -subj "/C=US/ST=North Carolina/L=Durham/O=Red Hat/OU=Project Receptor/CN=$node.receptor"
+  openssl ca -days 365 -notext -in conf/$node/backend.req -out conf/$node/backend.crt -cert ca/ca.crt -keyfile ca/ca.key -config openssl.cnf -batch
+done
 
 # Get the base Receptor image
 $CMD pull quay.io/project-receptor/receptor:latest

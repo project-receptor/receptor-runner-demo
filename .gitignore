@@ -1,0 +1,4 @@
+*.crt
+*.key
+*.req
+ca/pki/
