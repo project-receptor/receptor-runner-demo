@@ -4,12 +4,20 @@
 NODES="node1 node2 node3"
 declare -A NODEIPS=( ["node1"]="172.30.99.11" ["node2"]="172.30.99.12" ["node3"]="172.30.99.13" )
 
-# List of TLS CAs to create
+# List of CAs to create and their node domain suffixes
 declare -A CERTDOMAINS=(
   ["backend"]=".receptor"
   ["backend_client"]=".receptor"
   ["receptor"]=""
   ["receptor_client"]=""
+)
+
+# List of nodes to install certificates on
+declare -A CERTINSTALL=(
+  ["backend"]="node1 node3"
+  ["backend_client"]="node2"
+  ["receptor"]="node1 node2 node3"
+  ["receptor_client"]="node1"
 )
 
 # Custom networks don't work with rootless podman, so try podman

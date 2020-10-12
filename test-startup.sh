@@ -17,7 +17,7 @@ for tlsname in "${!CERTDOMAINS[@]}"; do
   done
   
   # Generate the node certificates
-  for node in $NODES; do
+  for node in ${CERTINSTALL[$tlsname]}; do
     openssl genrsa -out conf/$node/$tlsname.key 2048
     openssl req -key conf/$node/$tlsname.key -new -out conf/$node/$tlsname.req -subj "/C=US/ST=North Carolina/L=Durham/O=Red Hat/OU=Project Receptor/CN=$node${CERTDOMAINS[$tlsname]}"
     PKIDIR=ca/$tlsname/pki openssl ca -days 365 -notext -in conf/$node/$tlsname.req -out conf/$node/$tlsname.crt -cert ca/$tlsname/ca.crt -keyfile ca/$tlsname/ca.key -config openssl.cnf -batch
