@@ -3,18 +3,26 @@ set -e
 
 . ./test-env.sh
 
-# Create the CA
-mkdir -p ca/pki/newcerts
-touch ca/pki/index.txt
-openssl genrsa -out ca/ca.key 2048
-openssl req -x509 -new -key ca/ca.key -out ca/ca.crt -subj "/C=US/ST=North Carolina/L=Durham/O=Red Hat/OU=Project Receptor/CN=Demo CA"
-cp ca/ca.crt conf/node2/ca.crt
+for tlsname in "${!CERTDOMAINS[@]}"; do
 
-# Generate the node backend certificates
-for node in $NODES; do
-  openssl genrsa -out conf/$node/backend.key 2048
-  openssl req -key conf/$node/backend.key -new -out conf/$node/backend.req -subj "/C=US/ST=North Carolina/L=Durham/O=Red Hat/OU=Project Receptor/CN=$node.receptor"
-  openssl ca -days 365 -notext -in conf/$node/backend.req -out conf/$node/backend.crt -cert ca/ca.crt -keyfile ca/ca.key -config openssl.cnf -batch
+  # Create the CA
+  mkdir -p ca/$tlsname/pki/newcerts
+  touch ca/$tlsname/pki/index.txt
+  openssl genrsa -out ca/$tlsname/ca.key 2048
+  openssl req -x509 -new -key ca/$tlsname/ca.key -out ca/$tlsname/ca.crt -subj "/C=US/ST=North Carolina/L=Durham/O=Red Hat/OU=Project Receptor/CN=Demo CA $tlsname"
+
+  # Copy the CA cert to the node conf dirs
+  for node in $NODES; do
+    cp ca/$tlsname/ca.crt conf/$node/${tlsname}_ca.crt
+  done
+  
+  # Generate the node certificates
+  for node in $NODES; do
+    openssl genrsa -out conf/$node/$tlsname.key 2048
+    openssl req -key conf/$node/$tlsname.key -new -out conf/$node/$tlsname.req -subj "/C=US/ST=North Carolina/L=Durham/O=Red Hat/OU=Project Receptor/CN=$node${CERTDOMAINS[$tlsname]}"
+    PKIDIR=ca/$tlsname/pki openssl ca -days 365 -notext -in conf/$node/$tlsname.req -out conf/$node/$tlsname.crt -cert ca/$tlsname/ca.crt -keyfile ca/$tlsname/ca.key -config openssl.cnf -batch
+  done
+
 done
 
 # Get the base Receptor image

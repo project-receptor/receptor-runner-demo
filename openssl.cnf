@@ -3,7 +3,7 @@ default_ca	= CA_default
 
 [ CA_default ]
 
-dir		= ./ca/pki
+dir		= $ENV::PKIDIR
 certs		= $dir/certs
 crl_dir		= $dir/crl
 database	= $dir/index.txt

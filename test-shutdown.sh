@@ -12,11 +12,17 @@ $CMD network rm receptor
 
 # Remove generated certificates
 echo Removing certificates
-rm -f conf/node2/ca.crt
-rm -f ca/pki/newcerts/*.pem
-rm -fd ca/pki/newcerts
-rm -f ca/pki/index.txt*
-rm -fd ca/pki
-rm -f ca/ca.crt
-rm -f ca/ca.key
+for tlsname in "${!CERTDOMAINS[@]}"; do
+  rm -f conf/*/${tlsname}_ca.crt
+  rm -f conf/*/$tlsname.crt
+  rm -f conf/*/$tlsname.key
+  rm -f conf/*/$tlsname.req
+  rm -f ca/$tlsname/pki/newcerts/*.pem
+  rm -fd ca/$tlsname/pki/newcerts
+  rm -f ca/$tlsname/pki/index.txt*
+  rm -fd ca/$tlsname/pki
+  rm -f ca/$tlsname/ca.crt
+  rm -f ca/$tlsname/ca.key
+  rm -fd ca/$tlsname
+done
 rm -fd ca

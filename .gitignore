@@ -1,4 +1,4 @@
 *.crt
 *.key
 *.req
-ca/pki/
+ca/
